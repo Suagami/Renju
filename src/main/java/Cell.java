@@ -1,11 +1,11 @@
 class Cell
 {
-    private String status;
+    private Status status;
     private Coord coord;
 
     Cell()
     {
-        this.status = "E";
+        this.status = Status.EMPTY;
         this.coord = new Coord(0, 0);
     }
 
@@ -14,14 +14,24 @@ class Cell
         this.coord = coord;
     }
 
-    void setStatus(String status)
+    void setStatus(Status status)
     {
         this.status = status;
     }
 
-    String getStatus()
+    Status getStatus()
     {
         return this.status;
+    }
+
+    Coord getCoord()
+    {
+        return this.coord;
+    }
+
+    boolean equals(Cell obj)
+    {
+        return (this.coord.equals(obj.coord)) && (this.status.equals(obj.status));
     }
 }
 

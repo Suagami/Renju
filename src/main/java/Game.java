@@ -9,10 +9,11 @@ public class Game extends JFrame
     private static int turnNumber = 3;
     final static int SIZE = 15;
     private final static int IMAGE_SIZE = 48;
+    private Board gameBoard = new Board();
+
 
     public static void main(String[] args)
     {
-        new Board();
         new Game();
     }
 
@@ -33,7 +34,7 @@ public class Game extends JFrame
                 {
                     for(int y = 0; y < SIZE; y++)
                     {
-                        String tile = getTile(x, y);
+                        Tile tile = getTile(x, y);
                         g.drawImage(getImage(tile), x*IMAGE_SIZE, y*IMAGE_SIZE, this);
                     }
                 }
@@ -68,129 +69,134 @@ public class Game extends JFrame
         setLocationRelativeTo(null);
         setResizable(false);
         setVisible(true);
-        setIconImage(getImage("icon"));
+        setIconImage(getImage(Tile.ICON));
     }
 
-    private Image getImage(String name)
+    private Image getImage(Tile tile)
     {
-        String filename = "img/" + name.toLowerCase() + ".png";
+        String filename = "img/" + tile.getTitle().toLowerCase() + ".png";
         ImageIcon icon = new ImageIcon(getClass().getResource(filename));
         return icon.getImage();
     }
 
     private void makeTurn(Coord coord)
     {
-        if(Board.board[coord.x][coord.y].getStatus().equals("E"))
+        if(gameBoard.board[coord.x][coord.y].getStatus() == Status.EMPTY)
         {
-            Board.board[coord.x][coord.y].setStatus(Board.turn);
+            gameBoard.board[coord.x][coord.y].setStatus(gameBoard.turn);
             panel.repaint();
 
-            if(Board.winCondition(coord))
+            if(gameBoard.winCondition(coord))
             {
                 endGame();
             }
             else
             {
-                Board.switchTurn();
-                turnNumber++;
-                String current;
-
-                if(Board.turn.equals("B"))
-                    current = "Black";
+                if (gameBoard.tieCondition())
+                {
+                    tieGame();
+                }
                 else
-                    current = "White";
-
-                this.setTitle(current+ " player's turn "+turnNumber/2);
+                {
+                    gameBoard.switchTurn();
+                    turnNumber++;
+                    String current = gameBoard.turn.getTitle();
+                    this.setTitle(current + " player's turn " + turnNumber / 2);
+                }
             }
         }
     }
 
     private void endGame()
     {
-        String winner;
-
-        if(Board.turn.equals("B"))
-            winner = "Black";
-        else
-            winner = "White";
-
-        ImageIcon icon = new ImageIcon(getClass().getResource("img/"+Board.turn+".png"));
-        JOptionPane.showMessageDialog(this, winner+" player wins the game!",
+        String winner = gameBoard.turn.getTitle();
+        ImageIcon icon = new ImageIcon(getClass()
+                .getResource("img/" + gameBoard.turn.getTile().getTitle() + ".png"));
+        JOptionPane.showMessageDialog(this, winner + " player wins the game!",
                 "Congratulations!", JOptionPane.INFORMATION_MESSAGE, icon);
         this.dispose();
     }
 
-    private String getTile(int x, int y)
+
+    private void tieGame()
     {
-        if(Board.board[x][y].getStatus().equals("E"))
+        JOptionPane.showMessageDialog(this, "It's a tie!",
+                "Game Over!", JOptionPane.INFORMATION_MESSAGE);
+        this.dispose();
+    }
+
+
+    private Tile getTile(int x, int y)
+    {
+        if(gameBoard.board[x][y].getStatus() == Status.EMPTY)
         {
             switch (y) {
                 case (0):
                     switch (x) {
                         case (0):
-                            return "UL";
+                            return Tile.UL;
                         case (SIZE - 1):
-                            return "UR";
+                            return Tile.UR;
                         default:
-                            return "U";
+                            return Tile.U;
                     }
                 case (SIZE - 1):
                     switch (x) {
                         case (0):
-                            return "DL";
+                            return Tile.DL;
                         case (SIZE - 1):
-                            return "DR";
+                            return Tile.DR;
                         default:
-                            return "D";
+                            return Tile.D;
                     }
-                case (5):
+                case (SIZE / 2 - 2):
                     switch (x) {
                         case (0):
-                            return "L";
+                            return Tile.L;
                         case (SIZE - 1):
-                            return "R";
-                        case (5):
-                            return "S";
-                        case (9):
-                            return "S";
+                            return Tile.R;
+                        case (SIZE / 2 - 2):
+                            return Tile.S;
+                        case (SIZE / 2 + 2):
+                            return Tile.S;
                         default:
-                            return "C";
+                            return Tile.C;
                     }
-                case (9):
+                case (SIZE / 2 + 2):
                     switch (x) {
                         case (0):
-                            return "L";
+                            return Tile.L;
                         case (SIZE - 1):
-                            return "R";
-                        case (5):
-                            return "S";
-                        case (9):
-                            return "S";
+                            return Tile.R;
+                        case (SIZE / 2 - 2):
+                            return Tile.S;
+                        case (SIZE / 2 + 2):
+                            return Tile.S;
                         default:
-                            return "C";
+                            return Tile.C;
                     }
-                case (7):
+                case (SIZE/2):
                     switch (x) {
                         case (0):
-                            return "L";
+                            return Tile.L;
                         case (SIZE - 1):
-                            return "R";
-                        case (7):
-                            return "B";
+                            return Tile.R;
+                        case (SIZE/2):
+                            return Tile.B;
                         default:
-                            return "C";
+                            return Tile.C;
                     }
                 default:
                     switch (x) {
                         case (0):
-                            return "L";
+                            return Tile.L;
                         case (SIZE - 1):
-                            return "R";
+                            return Tile.R;
                         default:
-                            return "C";
+                            return Tile.C;
                     }
             }
         }
-        else return Board.board[x][y].getStatus();
+        else return gameBoard.board[x][y].getStatus().getTile();
     }
 }

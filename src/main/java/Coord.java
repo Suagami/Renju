@@ -11,4 +11,6 @@ public class Coord {
         return (this.x == obj.x) && (this.y == obj.y);
     }
 
+
+
 }
